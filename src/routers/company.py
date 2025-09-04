@@ -32,7 +32,7 @@ company_repository_dependency = Annotated[
 async def get_all(
     company_repository: company_repository_dependency, offset: int = 0, limit: int = 100
 ):
-    companies = company_repository.get_all(offset=offset, limit=limit)
+    companies, total = company_repository.get_all(offset=offset, limit=limit)
 
     result = []
     for company in companies:
@@ -40,7 +40,7 @@ async def get_all(
 
     return response_helper(
         success=True,
-        data=result,
+        data={"companies": result, "total": total},
         message=f"Retrieved companies successfully",
     )
 
@@ -57,7 +57,7 @@ async def get_one_by_id(
         company = company_repository.get_one_by(column_name="id", value=company_id)
         return response_helper(
             success=True,
-            data=Company.model_validate(company).model_dump(mode="json"),
+            data={"company": Company.model_validate(company).model_dump(mode="json")},
             message="Company retrieved successfully",
         )
     except NoResultFound as e:
@@ -80,7 +80,7 @@ async def create(
         )
         return response_helper(
             success=True,
-            data=Company.model_validate(company).model_dump(mode="json"),
+            data={"company": Company.model_validate(company).model_dump(mode="json")},
             message="Company created successfully",
         )
     except Exception as e:
@@ -118,7 +118,7 @@ async def update(
 
         return response_helper(
             success=True,
-            data=Company.model_validate(result).model_dump(mode="json"),
+            data={"company": Company.model_validate(result).model_dump(mode="json")},
             message="Company updated successfully",
         )
     except NoResultFound as e:

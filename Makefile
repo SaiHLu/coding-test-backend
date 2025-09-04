@@ -9,6 +9,12 @@ install:
 start:
 	@$(PYTHON) -m uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
+test:
+	@$(PYTHON) -m pytest . -s -v
+
+gui:
+	@$(PYTHON) -m streamlit run src/streamlit_app.py --server.port 8501
+
 create-migration:
 	@if [ -z "$(MSG)" ]; then \
 		echo "Usage: make create-migration MSG=\"Your migration message\""; \
@@ -38,4 +44,4 @@ migration-down:
 		$(ALEMBIC) downgrade -1; \
 	fi
 
-.PHONY: install create-migration migration-up migration-down
+.PHONY: install create-migration migration-up migration-down test

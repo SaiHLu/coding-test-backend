@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from typing import Any
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy import func
 
 
 from ..models.company import Company
@@ -18,7 +19,9 @@ class CompanyRepository:
         return company
 
     def get_all(self, offset: int = 0, limit: int = 100):
-        return self.db.exec(select(Company).offset(offset).limit(limit)).all()
+        companies = self.db.exec(select(Company).offset(offset).limit(limit)).all()
+        total = self.db.exec(select(func.count()).select_from(Company)).one()
+        return companies, total
 
     def get_one_by(self, column_name: str, value: Any):
         company = self.db.exec(
@@ -29,12 +32,6 @@ class CompanyRepository:
         return company
 
     def update(self, id: int, company: Company):
-        # existCompany = self.get_one_by("id", id)
-
-        # existCompany.name = company.name
-        # existCompany.industry = company.industry
-        # existCompany.country = company.country
-
         self.db.add(company)
         self.db.commit()
         self.db.refresh(company)
